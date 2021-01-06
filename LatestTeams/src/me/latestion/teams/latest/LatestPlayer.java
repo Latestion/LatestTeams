@@ -12,8 +12,18 @@ public class LatestPlayer {
 	
 	public boolean inCombat = false;
 	
-	public LatestPlayer() {
-		
+	public boolean autoClaiming = false;
+	public boolean autoUnclaiming = false;
+	
+	public boolean fChat = false;
+	
+	public LatestPlayer(UUID id) {
+		this.id = id;
+	}
+	
+	public LatestPlayer(UUID id, LatestTeam team) {
+		this.id = id;
+		this.team = team;
 	}
 	
 	public LatestTeam getTeam() {
@@ -42,6 +52,17 @@ public class LatestPlayer {
 	
 	public void removeTeam() {
 		this.team = null;
+	}
+
+	public void toggleFChat() {
+		if (fChat) {
+			fChat = false;
+			return;
+		}
+		else {
+			fChat = true;
+			return;
+		}
 	}
 	
 }

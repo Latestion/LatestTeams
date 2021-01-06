@@ -32,7 +32,7 @@ public class Utils {
 	public String getMessage(String[] args, int start) {
 		StringBuffer sb = new StringBuffer();
       	for (int i = start; i < args.length; i++) {
-      		if ((i + 2) == args.length) sb.append(args[i]);
+      		if ((i + 1) == args.length) sb.append(args[i]);
       		else sb.append(args[i] + " ");
       	}
       	return sb.toString();
@@ -45,6 +45,15 @@ public class Utils {
 	public String getTeamDetails(String name) {
 		
 		return null;
+	}
+
+	public int getInt(String string) {
+		try {
+			return Integer.parseInt(string);
+		}
+		catch(Exception e) {
+			return 0;
+		}
 	}
 
 }

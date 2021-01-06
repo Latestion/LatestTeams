@@ -1,8 +1,8 @@
-main: me.Latestion.Teams.Main
+main: me.latestion.teams.LatestTeams
 author: Latestion
 version: 1.0
-name: ModdedTeams
+name: LatestTeams
 
 commands:
-  Faction:
-    aliases: [Factions, f]
+  Team:
+    aliases: [Teams, T]
