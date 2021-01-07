@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 
 import me.latestion.teams.LatestTeams;
 
@@ -18,12 +19,22 @@ public class LatestTeam {
 	public List<LatestPlayer> invited = new ArrayList<>();
 	private LatestTeams plugin;
 	
+	private List<Chunk> chunks = new ArrayList<>();
+	
 	private int value = 0;
 	
 	public LatestTeam(LatestTeams plugin, String name) {
 		this.plugin = plugin;
 		this.name = name;
 	}
+	
+	public LatestTeam(LatestTeams plugin, String name, LatestPlayer leader) {
+		this.plugin = plugin;
+		this.name = name;
+		this.leader = leader;
+		team.add(leader);
+	}
+
 
 	public String getName() {	
 		return name;
@@ -91,4 +102,19 @@ public class LatestTeam {
 		return team;
 	}
 	
+	public List<Chunk> getTeamChunks() {
+		return chunks;
+	}
+	
+	public void addChunk(Chunk c) {
+		chunks.add(c);
+	}
+	
+	public void removeChunk(Chunk c) {
+		chunks.remove(c);
+	}
+	
+	public void clearChunk() {
+		chunks.clear();
+	}
 }

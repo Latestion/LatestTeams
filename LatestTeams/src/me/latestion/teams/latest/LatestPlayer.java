@@ -58,11 +58,27 @@ public class LatestPlayer {
 		if (fChat) {
 			fChat = false;
 			return;
-		}
-		else {
-			fChat = true;
+		}	
+		fChat = true;
+		return;
+	}
+	
+	public void toggleClaiming() {
+		if (autoClaiming) {
+			autoClaiming = false;
 			return;
 		}
+		autoClaiming = true;
+		return;
+	}
+	
+	public void toggleUnClaiming() {
+		if (autoUnclaiming) {
+			autoUnclaiming = false;
+			return;
+		}
+		autoUnclaiming = true;
+		return;
 	}
 	
 }

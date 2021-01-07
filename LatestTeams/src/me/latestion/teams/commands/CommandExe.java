@@ -2,6 +2,7 @@ package me.latestion.teams.commands;
 
 import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +10,8 @@ import org.bukkit.entity.Player;
 
 import me.latestion.teams.LatestTeams;
 import me.latestion.teams.latest.LatestPlayer;
+import me.latestion.teams.latest.LatestTeam;
+import me.latestion.teams.utils.ChunkClaiming;
 import me.latestion.teams.utils.Utils;
 
 public class CommandExe implements CommandExecutor {
@@ -63,6 +66,9 @@ public class CommandExe implements CommandExecutor {
 					return false;
 				}
 				
+				LatestTeam team = new LatestTeam(plugin, name, plugin.getLatestPlayer(player));
+				plugin.lateTeam.put(name, team);
+				plugin.inv.prepareInv();
 				/*
 				 * Create Team
 				 * Inv add team as stack
@@ -109,7 +115,7 @@ public class CommandExe implements CommandExecutor {
 				player.openInventory(plugin.inv.getInv());	
 			}
 			
-			if (args[0].equalsIgnoreCase("f") || args[0].equalsIgnoreCase("faction") || args[0].equalsIgnoreCase("p") || args[0].equalsIgnoreCase("player")) {
+			if (args[0].equalsIgnoreCase("t") || args[0].equalsIgnoreCase("team") || args[0].equalsIgnoreCase("p") || args[0].equalsIgnoreCase("player")) {
 				
 				if (args.length == 1) {
 					if (!plugin.getLatestPlayer(player).inTeam()) {
@@ -157,10 +163,8 @@ public class CommandExe implements CommandExecutor {
 				
 				String desc = util.getMessage(args, 1);
 				plugin.getPlayerTeam(player.getUniqueId()).setDesc(desc);
-				// Desc set msg
-				
-			}
-			
+				// Desc set msg	
+			}			
 			if (args[0].equalsIgnoreCase("invite") || args[0].equalsIgnoreCase("inv") || args[0].equalsIgnoreCase("i")) {
 				
 				if (args.length == 1 || args.length == 2) {
@@ -277,9 +281,15 @@ public class CommandExe implements CommandExecutor {
 			if (args[0].equalsIgnoreCase("money")) {
 				
 				if (args.length == 1) {
-					/*
-					 * Own faction
-					 */
+					
+					if (!plugin.getLatestPlayer(player).inTeam()) {
+						// Player Not In Taem
+						return false;
+					}
+					
+					int i = plugin.getPlayerTeam(player).getValue();
+					// Send Msg
+
 					return false;
 				}
 				
@@ -294,14 +304,55 @@ public class CommandExe implements CommandExecutor {
 					return false;
 				}
 				
+				if (!plugin.getLatestPlayer(player).inTeam()) {
+					// Player Not In Taem
+					return false;
+				}
+				
+				LatestTeam team = plugin.getPlayerTeam(player);
+				LatestPlayer lplayer = plugin.getLatestPlayer(player);
+				
+				if (team.leader != lplayer) {
+					// Not Leader
+					return false;
+				}
+				
 				if (args[1].equalsIgnoreCase("o") || args[1].equalsIgnoreCase("one")) {
 					
-				}
-				
-				if (args[1].equalsIgnoreCase("a") || args[1].equalsIgnoreCase("auto")) {
+					Location loc = player.getLocation();
+					ChunkClaiming claim = new ChunkClaiming(plugin);
+					
+					if (claim.isChunkClaimed(loc)) {
+						// Chunk Already Claimed
+						return false;
+					}
+					
+					if (team.getTeamChunks().size() < plugin.getConfig().getInt("Max-Chunk-Claim-Limit")) {
+						// Claimed Chunk
+						team.addChunk(loc.getChunk());
+					}
+					
+					else {
+						// Already At Max Limit
+						return false;
+					}
 					
 				}
 				
+				if (args[1].equalsIgnoreCase("a") || args[1].equalsIgnoreCase("auto")) {		
+					if (lplayer.autoUnclaiming) {
+						// Already Unclaiming
+						return false;
+					}
+					
+					if (team.getTeamChunks().size() == plugin.getConfig().getInt("Max-Chunk-Claim-Limit")) {
+						// Already At Max Limit
+						return false;
+					}
+					
+					// Send Message
+					lplayer.toggleClaiming();				
+				}
 			}
 			if (args[0].equalsIgnoreCase("unclaim")) {
 				
@@ -310,15 +361,59 @@ public class CommandExe implements CommandExecutor {
 					return false;
 				}
 				
+
+				if (!plugin.getLatestPlayer(player).inTeam()) {
+					// Player Not In Taem
+					return false;
+				}
+				
+				LatestTeam team = plugin.getPlayerTeam(player);
+				LatestPlayer lplayer = plugin.getLatestPlayer(player);
+				
+				if (team.leader != lplayer) {
+					// Not Leader
+					return false;
+				}
+				
 				if (args[1].equalsIgnoreCase("o") || args[1].equalsIgnoreCase("one")) {
+					
+					Location loc = player.getLocation();
+					ChunkClaiming claim = new ChunkClaiming(plugin);
+					
+					if (!claim.isChunkClaimed(loc)) {
+						// Chunk Is Not Claimed
+						return false;
+					}
+					
+					if (team.getTeamChunks().contains(loc.getChunk())) {
+						// Unclaimed Message
+						team.removeChunk(loc.getChunk());
+					}
+					
+					else {
+						// They Dont Own
+						return false;
+					}
 					
 				}
 				
 				if (args[1].equalsIgnoreCase("a") || args[1].equalsIgnoreCase("auto")) {
+					if (lplayer.autoClaiming) {
+						// Already Claiming
+						return false;
+					}
 					
+					if (team.getTeamChunks().size() == 0) {
+						// They Dont Have Any Chunks
+						return false;
+					}
+					
+					// Send Message
+					lplayer.toggleUnClaiming();		
 				}
 				if (args[1].equalsIgnoreCase("all")) {
-					
+					// Send Message
+					plugin.getPlayerTeam(player).clearChunk();
 				}
 			}
 			if (args[0].equalsIgnoreCase("top")) {
@@ -383,6 +478,48 @@ public class CommandExe implements CommandExecutor {
 				for (LatestPlayer p : plugin.getPlayerTeam(player).getPlayers()) {
 					// Send Message
 				}	
+			}
+			if (args[0].equalsIgnoreCase("leader")) {
+				
+				if (args.length == 1) {
+					// Format
+					return false;
+				}
+				
+				String name = args[1];
+				UUID id = getPlayerIDFromName(name);
+				LatestPlayer lplayer = plugin.getLatestPlayer(id);
+				
+				if (player.getUniqueId() == id) {
+					// Format
+					return false;
+				}
+				
+				if (!plugin.getLatestPlayer(player).inTeam()) {
+					// Player Not In Team
+					return false;
+				}
+				
+				if (!lplayer.inTeam()) {
+					// Player Not In Team
+					return false;
+				}
+				
+				LatestTeam team = plugin.getPlayerTeam(player);
+				
+				if (team.leader != plugin.getLatestPlayer(player.getUniqueId())) {
+					// Not Leader
+					return false;
+				}
+				
+				if (!team.getPlayers().contains(lplayer)) {
+					// Player Not in same team
+					return false;
+				}
+				
+				// Send Message
+				team.setLeader(lplayer);
+
 			}
 		}
 		return false;

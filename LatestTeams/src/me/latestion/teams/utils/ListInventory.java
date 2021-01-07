@@ -26,7 +26,7 @@ public class ListInventory {
 		return invs.get(0);
 	}
 
-	private void prepareInv() {
+	public void prepareInv() {
 		invs.clear();
 		Inventory inv = Bukkit.createInventory(null, 54, ChatColor.GOLD + "Teams");
 		inv.setItem(53, arrow(true));

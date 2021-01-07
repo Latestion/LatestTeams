@@ -3,3 +3,10 @@ Chest-Loc:
   x: 0
   y: 0
   z: 0
+  
+Spetnaz-ID:
+  helmet: 123
+  chest: 124
+  boots: 125
+  
+Max-Chunk-Claim-Limit: 9
